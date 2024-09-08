@@ -1,3 +1,6 @@
+import {formatCurrency} from '../scripts/utils/money.js'
+
+
 export function getProduct(productId){
   let matchingProduct;
   products.forEach((product) => {
@@ -11,6 +14,195 @@ export function getProduct(productId){
 }
 
 
+export class Product{
+  id;
+  image;
+  name;
+  rating;
+  priceCents;
+  keywords;
+
+  constructor(productDetails){
+    this.id = productDetails.id;
+    this.image = productDetails.image;
+    this.name = productDetails.name;
+    this.rating = productDetails.rating;
+    this.priceCents = productDetails.priceCents;
+    this.keywords = productDetails.keywords;
+  }
+
+  getStarsUrl(){
+    return `images/ratings/rating-${this.rating.stars * 10}.png`
+  }
+
+  getPrice(){
+    return `$${formatCurrency(this.priceCents)}`;
+  }
+
+  extraInfoHTML(){
+    return '';
+  }
+}
+
+export class Clothing extends Product{
+  sizeChartLink;
+
+  constructor(productDetails){
+    super(productDetails);
+    this.sizeChartLink = productDetails.sizeChartLink;
+  }
+
+  extraInfoHTML(){
+    //super.extraInfoHTML();
+    return `
+      <a href="${this.sizeChartLink}" target ="_blank">
+        Size chart
+      </a>
+    `;
+  }
+}
+
+export class Appliance extends Product{
+  instructionLink;
+  warrantyLink;
+
+  constructor(productDetails){
+    super(productDetails)
+    this.instructionLink = productDetails.instructionLink;
+    this.warrantyLink = productDetails.warrantyLink;
+  }
+
+  extraInfoHTML(){
+    //super.extraInfoHTML();
+    return `
+      <a href="${this.instructionLink}" target ="_blank">
+        Instruction
+      </a>
+      <a href="${this.warrantyLink}" target ="_blank">
+        Warranty
+      </a>
+    `;
+  }
+}
+
+/*
+const date = new Date();
+console.log(date);
+console.log(date.toLocaleTimeString());
+*/
+
+/*
+console.log(this);
+
+const object2 = {
+  a: 2,
+  b: this.a
+};
+*/
+
+/*
+function logThis(){
+  console.log(this);
+}
+
+logThis();
+logThis.call('hello');
+
+this
+
+const object3 = {
+  method: () =>{
+    console.log(this)
+  }
+};
+
+object3.method();
+*/
+
+export let products = [];
+
+export function loadProductsFetch(){
+  const promise = fetch(
+    'https://supersimplebackend.dev/products'
+  ).then((response)=>{
+    return response.json();
+  }).then((productsData) => {
+    products = productsData.map((productDetails)=> {
+      if(productDetails.type === 'clothing'){
+        return new Clothing(productDetails);
+      }
+      else
+      if(productDetails.type === 'appliance')
+      {
+        return new Appliance(productDetails);
+      }
+      else
+      {
+        return new Product(productDetails);
+      }
+      
+    });
+    console.log('Load prodcuts.');
+
+  }).catch((error) => {
+    console.log('Unexpected error. Please try again later.');
+  });
+
+  return promise;
+}
+
+
+
+/*
+loadProductsFetch().then(()=>{
+  console.log('next step');
+});
+*/
+
+export function loadProducts(fun){
+  const xhr = new XMLHttpRequest();
+
+  xhr.addEventListener('load', ()=>{
+    products = JSON.parse(xhr.response).map((productDetails)=> {
+      if(productDetails.type === 'clothing'){
+        return new Clothing(productDetails);
+      }
+      else
+      if(productDetails.type === 'appliance')
+      {
+        return new Appliance(productDetails);
+      }
+      else
+      {
+        return new Product(productDetails);
+      }
+      
+    });
+
+    console.log('Load products.');
+
+    fun();
+
+  });
+
+  xhr.addEventListener('error', (error)=>{
+    console.log('Unexpected error. Please try again later.');
+  });
+
+  xhr.open('GET', 'https://supersimplebackend.dev/products');
+  xhr.send();
+} 
+
+
+
+
+
+
+
+
+
+
+/*
 export const products = [
   {
     id: "e43638ce-6aa0-4b85-b27f-e1d07eb678c6",
@@ -71,7 +263,10 @@ export const products = [
       "toaster",
       "kitchen",
       "appliances"
-    ]
+    ],
+    type: "appliance",
+    instructionLink: "images/appliance-instructions.png",
+    warrantyLink:"images/appliance-warranty.png"
   },
   {
     id: "3ebe75dc-64d2-4137-8860-1f5a963e534b",
@@ -256,7 +451,10 @@ export const products = [
       "water boiler",
       "appliances",
       "kitchen"
-    ]
+    ],
+    type: "appliance",
+    instructionLink: "images/appliance-instructions.png",
+    warrantyLink:"images/appliance-warranty.png"
   },
   {
     id: "6b07d4e7-f540-454e-8a1e-363f25dbae7d",
@@ -561,7 +759,10 @@ export const products = [
       "coffeemakers",
       "kitchen",
       "appliances"
-    ]
+    ],
+    type: "appliance",
+    instructionLink: "images/appliance-instructions.png",
+    warrantyLink:"images/appliance-warranty.png"
   },
   {
     id: "02e3a47e-dd68-467e-9f71-8bf6f723fdae",
@@ -621,7 +822,10 @@ export const products = [
       "food blenders",
       "kitchen",
       "appliances"
-    ]
+    ],
+    type: "appliance",
+    instructionLink: "images/appliance-instructions.png",
+    warrantyLink:"images/appliance-warranty.png"
   },
   {
     id: "36c64692-677f-4f58-b5ec-0dc2cf109e27",
@@ -670,4 +874,19 @@ export const products = [
       "mens"
     ]
   }
-];
+].map((productDetails)=> {
+  if(productDetails.type === 'clothing'){
+    return new Clothing(productDetails);
+  }
+  else
+  if(productDetails.type === 'appliance')
+  {
+    return new Appliance(productDetails);
+  }
+  else
+  {
+    return new Product(productDetails);
+  }
+  
+});
+*/
