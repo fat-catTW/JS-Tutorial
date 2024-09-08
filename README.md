@@ -1,4 +1,4 @@
-Current state: Not finish
+Current state: Finished.
 
 Recreate Amazon website using HTML, CSS and JS.
 
